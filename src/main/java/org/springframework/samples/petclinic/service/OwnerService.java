@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -80,9 +81,11 @@ public class OwnerService {
 	@Transactional
 	public void deleteOwner(Owner owner) throws DataAccessException {
 		//deleting owner
-		ownerRepository.delete(owner);	
-
-			
+		ownerRepository.delete(owner);
 	}	
+	
+	public List<Owner> FindOwnersApplyingPet(int petId){
+		return ownerRepository.FindOwnersApplyingPet(petId);
+	}
 
 }

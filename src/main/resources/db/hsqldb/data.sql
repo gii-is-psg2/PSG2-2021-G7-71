@@ -84,6 +84,22 @@ INSERT INTO pets(id,name,birth_date,type_id,owner_id,adoption) VALUES (11, 'Fred
 INSERT INTO pets(id,name,birth_date,type_id,owner_id,adoption) VALUES (12, 'Lucky', '2010-06-24', 2, 10,FALSE);
 INSERT INTO pets(id,name,birth_date,type_id,owner_id,adoption) VALUES (13, 'Sly', '2012-06-08', 1, 10,TRUE);
 
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(1,1,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(2,1,3);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(3,3,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(4,3,4);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(5,3,5);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(6,7,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(7,7,7);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(8,7,8);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(9,7,9);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(10,9,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(11,9,8);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(12,9,5);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(13,11,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(14,13,2);
+INSERT INTO adoptions(id,pet_id,owner_id) VALUES(15,13,5);
+
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (1, 7, '2013-01-01', 'rabies shot');
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (2, 8, '2013-01-02', 'rabies shot');
 INSERT INTO visits(id,pet_id,visit_date,description) VALUES (3, 8, '2013-01-03', 'neutered');

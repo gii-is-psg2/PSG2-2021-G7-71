@@ -16,18 +16,23 @@
 package org.springframework.samples.petclinic.web;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.OwnerService;
 import org.springframework.samples.petclinic.service.VetService;
+import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
 import org.springframework.samples.petclinic.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -148,5 +153,30 @@ public class OwnerController {
 		mav.addObject(this.ownerService.findOwnerById(ownerId));
 		return mav;
 	}
-
+	
+    // Visualizar listado de Owners que ha aplicado Adoption de un Pet
+    @GetMapping(value = "/pets/{petId}/adoptions")
+	public String showOwnersApplying(@PathVariable("petId") int petId, ModelMap model) {
+    	List<Owner> owners = this.ownerService.FindOwnersApplyingPet(petId);
+		model.put("owners", owners);
+		return "owners/ApplicatedOwners";
+    }
+//    @PostMapping(value = "/pets/{petId}/edit")
+//    public String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner,@PathVariable("petId") int petId, ModelMap model) {
+//	if (result.hasErrors()) {
+//		model.put("pet", pet);
+//		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+//	}
+//	else {
+//                    Pet petToUpdate=this.petService.findPetById(petId);
+//		BeanUtils.copyProperties(pet, petToUpdate, "id","owner","visits");                                                                                  
+//                try {                    
+//                    this.petService.savePet(petToUpdate);                    
+//                } catch (DuplicatedPetNameException ex) {
+//                    result.rejectValue("name", "duplicate", "already exists");
+//                    return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+//                }
+//		return "redirect:/owners/{ownerId}";
+//	}
+//    }
 }
