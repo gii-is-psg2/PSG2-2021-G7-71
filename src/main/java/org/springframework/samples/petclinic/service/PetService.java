@@ -79,7 +79,17 @@ public class PetService {
 	public void deletePet(Pet pet) throws DataAccessException {
 		this.petRepository.delete(pet);
 	}
-  
+	//----
+	@Transactional
+	public void adoptionPet(Pet pet) throws DataAccessException {
+		pet.setAdoption(!pet.getAdoption());
+		this.petRepository.save(pet);
+	}
+	@Transactional
+	public Iterable<Pet> adoptionPetList() throws DataAccessException {
+		return petRepository.findByAdoptionTrue();
+	}
+	//-----
 	public Collection<Visit> findVisitsByPetId(int petId) {
 		return visitRepository.findByPetId(petId);
 	}

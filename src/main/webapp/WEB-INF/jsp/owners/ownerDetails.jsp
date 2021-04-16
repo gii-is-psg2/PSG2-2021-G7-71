@@ -62,7 +62,8 @@
                         <dd><petclinic:localDate date="${pet.birthDate}" pattern="yyyy-MM-dd"/></dd>
                         <dt><fmt:message key="petInformation"/></dt>
                         <dd><c:out value="${pet.type.name}"/></dd>
-                        
+                        <dt><fmt:message key="adoption"/></dt>
+                        <dd>  <c:out value="${pet.adoption ? 'Sí' : 'No'}"/>
                         <dt>
                            <spring:url value="/owners/{ownerId}/pets/{petId}/edit" var="petUrl">
                                <spring:param name="ownerId" value="${owner.id}"/>
@@ -70,7 +71,13 @@
                            </spring:url>
                            <a href="${fn:escapeXml(petUrl)}"><fmt:message key="updatePet"/></a>
                        	</dt>
-                        
+                        <dt>
+	                       	<spring:url value="/owners/{ownerId}/pets/{petId}/adopt" var="adoptUrl">
+	                           <spring:param name="ownerId" value="${owner.id}"/>
+	                           <spring:param name="petId" value="${pet.id}"/>
+	                       	</spring:url>
+	                       	<a href="${fn:escapeXml(adoptUrl)}"><fmt:message key="adoptPet"/></a>
+                   		</dt>
                         
                         <dt>
 	                       	<spring:url value="/owners/{ownerId}/pets/{petId}/delete" var="deleteUrl">

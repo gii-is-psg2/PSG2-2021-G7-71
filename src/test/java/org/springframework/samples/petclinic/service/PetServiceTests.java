@@ -239,7 +239,15 @@ class PetServiceTests {
 		Pet petDeleted = this.petService.findPetById(1);
 		assertThat(petDeleted).isEqualTo(null);
 	}
-		
+	@Test
+	@Transactional
+	void shoulAdoptPet() {
+		Pet pet = this.petService.findPetById(1);
+		Boolean petadoption = this.petService.findPetById(1).getAdoption();
+		this.petService.adoptionPet(pet);
+		Boolean petDeleted = this.petService.findPetById(1).getAdoption();
+		assertThat(petDeleted).isEqualTo(!petadoption);
+	}
 	@Test
 	void shouldFindBookingsByPetId() {
 		List<Booking> bookings = this.petService.findBookingsByPetId(1);

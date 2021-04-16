@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -84,7 +85,19 @@ public class PetController {
 	public void initPetBinder(WebDataBinder dataBinder) {
 		dataBinder.setValidator(new PetValidator());
 	}
-
+	@GetMapping("pets/listPets")
+	public String listPetInAdoption(ModelMap modelMap) {		
+		String vista= "pets/listPets";
+		Iterable<Pet> pet = petService.adoptionPetList()  ;
+		Iterator<Pet> it_Pet = pet.iterator();
+		
+		if (!(it_Pet.hasNext())) {
+			modelMap.addAttribute("message", "No hay mascotas en adopcion");
+		}
+		modelMap.addAttribute("pet",pet);
+		return vista;
+		
+	}
 	@GetMapping(value = "/pets/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
@@ -156,6 +169,14 @@ public class PetController {
     	this.petService.deletePet(pet);
     	return "redirect:/owners/{ownerId}";
     }
-    
+    @GetMapping(value = "/pets/{petId}/adopt")
+    public String adoptPet(@PathVariable("ownerId") int ownerId,
+    		@PathVariable("petId") int petId) {
+    	//Owner owner = this.ownerService.findOwnerById(ownerId);
+    	Pet pet = this.petService.findPetById(petId);
+    	//owner.removePet(pet);
+    	this.petService.adoptionPet(pet);
+    	return "redirect:/owners/{ownerId}";
+    }
 
 }
