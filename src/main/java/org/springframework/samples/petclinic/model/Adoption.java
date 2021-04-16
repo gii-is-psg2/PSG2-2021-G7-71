@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "adoptions")
-public class Adoption {
+public class Adoption extends BaseEntity{
 	@ManyToOne
 	@JoinColumn(name = "pet_id")
 	private Pet pet;

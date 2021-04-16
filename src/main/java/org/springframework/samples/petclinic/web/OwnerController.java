@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.web;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +24,14 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.model.Adoption;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.User;
+import org.springframework.samples.petclinic.service.AdoptionService;
 import org.springframework.samples.petclinic.service.AuthoritiesService;
 import org.springframework.samples.petclinic.service.OwnerService;
+import org.springframework.samples.petclinic.service.PetService;
 import org.springframework.samples.petclinic.service.VetService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
 import org.springframework.samples.petclinic.service.UserService;
@@ -50,10 +55,16 @@ public class OwnerController {
 	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
 	private final OwnerService ownerService;
+	
+	private final PetService petService;
+	
+	private final AdoptionService adoptionService;
 
 	@Autowired
-	public OwnerController(OwnerService ownerService, UserService userService, AuthoritiesService authoritiesService) {
+	public OwnerController(OwnerService ownerService, PetService petService, AdoptionService adoptionService, UserService userService, AuthoritiesService authoritiesService) {
 		this.ownerService = ownerService;
+		this.petService = petService;
+		this.adoptionService = adoptionService;
 	}
 
 	@InitBinder
@@ -155,28 +166,33 @@ public class OwnerController {
 	}
 	
     // Visualizar listado de Owners que ha aplicado Adoption de un Pet
-    @GetMapping(value = "/pets/{petId}/adoptions")
+    @GetMapping(value = "/owners/adoptions/{petId}")
 	public String showOwnersApplying(@PathVariable("petId") int petId, ModelMap model) {
     	List<Owner> owners = this.ownerService.FindOwnersApplyingPet(petId);
 		model.put("owners", owners);
 		return "owners/ApplicatedOwners";
     }
-//    @PostMapping(value = "/pets/{petId}/edit")
-//    public String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner,@PathVariable("petId") int petId, ModelMap model) {
-//	if (result.hasErrors()) {
-//		model.put("pet", pet);
-//		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-//	}
-//	else {
-//                    Pet petToUpdate=this.petService.findPetById(petId);
-//		BeanUtils.copyProperties(pet, petToUpdate, "id","owner","visits");                                                                                  
-//                try {                    
-//                    this.petService.savePet(petToUpdate);                    
-//                } catch (DuplicatedPetNameException ex) {
-//                    result.rejectValue("name", "duplicate", "already exists");
-//                    return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-//                }
-//		return "redirect:/owners/{ownerId}";
-//	}
-//    }
+    
+    @PostMapping(value = "/owners/assign/{petId}")
+    public String assignedAdoptionToOwner(Owner owner, BindingResult result, @PathVariable("petId") int petId, ModelMap model) {
+	if (result.hasErrors()) {
+		List<Owner> owners = this.ownerService.FindOwnersApplyingPet(petId);
+		model.put("owners", owners);
+		return "/owners/adoptions/" + petId;
+	}else {
+	// Asignar el ownerId del pet al otro owner
+	// Borrar todas las adoptions con petId
+	
+		Pet pet = petService.findPetById(petId);
+		owner.addPet(pet);
+		
+		Iterable<Adoption> aux = adoptionService.findByPet(pet);
+		Iterator<Adoption> it = aux.iterator();
+		
+		while(it.hasNext()) {
+			adoptionService.delete(it.next());
+			}
+		}
+    return VIEWS_OWNER_CREATE_OR_UPDATE_FORM; //OJO que esto hay que cambiarlo
+    }
 }
