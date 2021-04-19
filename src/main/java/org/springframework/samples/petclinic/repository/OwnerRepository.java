@@ -62,10 +62,5 @@ public interface OwnerRepository extends Repository<Owner, Integer> {
 	 */	
 	@Query("SELECT owner FROM Owner owner left join fetch owner.pets WHERE owner.id =:id")
 	public Owner findById(@Param("id") int id);
-	
-	@Query(value = "SELECT o.* FROM Owner o "
-			+ "INNER JOIN Adoption a ON o.id = a.owner_id "
-			+ "WHERE a.pet_id = :given_pet_id%", nativeQuery = true)
-	List<Owner> FindOwnersApplyingPet(@Param("given_pet_id") Integer petId) throws DataAccessException;
 
 }

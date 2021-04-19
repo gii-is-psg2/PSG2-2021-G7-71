@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.web;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.model.Adoption;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
@@ -168,31 +170,30 @@ public class OwnerController {
     // Visualizar listado de Owners que ha aplicado Adoption de un Pet
     @GetMapping(value = "/owners/adoptions/{petId}")
 	public String showOwnersApplying(@PathVariable("petId") int petId, ModelMap model) {
-    	List<Owner> owners = this.ownerService.FindOwnersApplyingPet(petId);
+		Collection<Owner> owners = this.adoptionService.findOwnerByPetId(petId);
 		model.put("owners", owners);
+		model.addAttribute("petId", petId);
 		return "owners/ApplicatedOwners";
     }
     
-    @PostMapping(value = "/owners/assign/{petId}")
-    public String assignedAdoptionToOwner(Owner owner, BindingResult result, @PathVariable("petId") int petId, ModelMap model) {
+    @GetMapping(value = "/owners/assign/{petId}")
+    public String assignedAdoptionToOwner(Owner owner, BindingResult result, @PathVariable("petId") int petId, ModelMap model, Principal user) {
 	if (result.hasErrors()) {
-		List<Owner> owners = this.ownerService.FindOwnersApplyingPet(petId);
+		Collection<Owner> owners = this.adoptionService.findOwnerByPetId(petId);
 		model.put("owners", owners);
 		return "/owners/adoptions/" + petId;
-	}else {
-	// Asignar el ownerId del pet al otro owner
-	// Borrar todas las adoptions con petId
+	}		
+	Pet pet = petService.findPetById(petId);
+	Integer originalOwner = pet.getOwner().getId();
+	owner.addPet(pet);
 	
-		Pet pet = petService.findPetById(petId);
-		owner.addPet(pet);
-		
-		Iterable<Adoption> aux = adoptionService.findByPet(pet);
-		Iterator<Adoption> it = aux.iterator();
-		
-		while(it.hasNext()) {
-			adoptionService.delete(it.next());
-			}
-		}
-    return VIEWS_OWNER_CREATE_OR_UPDATE_FORM; //OJO que esto hay que cambiarlo
+	Iterable<Adoption> aux = adoptionService.findByPet(pet);
+	Iterator<Adoption> it = aux.iterator();
+	
+	while(it.hasNext()) {
+		adoptionService.delete(it.next());
+	}
+	String vista = "redirect:/owners/" + originalOwner;
+    return vista;
     }
 }
