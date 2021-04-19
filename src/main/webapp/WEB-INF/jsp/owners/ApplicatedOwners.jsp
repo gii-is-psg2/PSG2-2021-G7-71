@@ -40,7 +40,7 @@
 							<spring:param name="petId" value="${petId}" />
 						</spring:url>
 						<form class="btn-line" action="${fn:escapeXml(assignURL)}">
-							<input name="owner" value="${owners.id}">
+							<input type="hidden" name="owner" value="${owners.id}">
 							<button class="btn btn-default" type="submit">Accept petition</button>
 						</form> 
 				</td>
