@@ -37,9 +37,14 @@ public class AdoptionService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<Integer> findAlreadyAppliedPetsIdsByOwner(int ownerId){
-		return this.adoptionRepository.findAlreadyAppliedPetsIdsByOwner(ownerId);
+	public Collection<Integer> findOwnerByPetId(int petId){
+		return this.adoptionRepository.findOwnerByPetId(petId);
 	}
+	
+//	@Transactional(readOnly = true)
+//	public List<Integer> findAlreadyAppliedPetsIdsByOwner(int ownerId){
+//		return this.adoptionRepository.findAlreadyAppliedPetsIdsByOwner(ownerId);
+//	}
 
 	@Transactional
 	public void saveAdoption(Adoption adoption){
