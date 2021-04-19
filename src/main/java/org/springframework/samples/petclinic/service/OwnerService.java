@@ -83,9 +83,5 @@ public class OwnerService {
 		//deleting owner
 		ownerRepository.delete(owner);
 	}	
-	
-	public List<Owner> FindOwnersApplyingPet(int petId){
-		return ownerRepository.FindOwnersApplyingPet(petId);
-	}
 
 }
