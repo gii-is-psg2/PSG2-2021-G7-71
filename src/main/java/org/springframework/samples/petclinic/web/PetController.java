@@ -16,6 +16,7 @@
 package org.springframework.samples.petclinic.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.model.Adoption;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.samples.petclinic.service.AdoptionService;
 import org.springframework.samples.petclinic.service.OwnerService;
 import org.springframework.samples.petclinic.service.PetService;
 import org.springframework.samples.petclinic.service.exceptions.DuplicatedPetNameException;
@@ -49,11 +51,13 @@ public class PetController {
 
 	private final PetService petService;
         private final OwnerService ownerService;
+        private final AdoptionService adoptionService;
 
 	@Autowired
-	public PetController(PetService petService, OwnerService ownerService) {
+	public PetController(PetService petService, OwnerService ownerService,AdoptionService adoptionService) {
 		this.petService = petService;
                 this.ownerService = ownerService;
+                this.adoptionService = adoptionService;
 	}
 
 	@ModelAttribute("types")
@@ -86,15 +90,16 @@ public class PetController {
 		dataBinder.setValidator(new PetValidator());
 	}
 	@GetMapping("pets/listPets")
-	public String listPetInAdoption(ModelMap modelMap) {		
+	public String listPetInAdoption(@PathVariable("ownerId") int ownerId,ModelMap modelMap) {		
 		String vista= "pets/listPets";
 		Iterable<Pet> pet = petService.adoptionPetList()  ;
 		Iterator<Pet> it_Pet = pet.iterator();
-		
+		Iterable<Pet> appliedpet = adoptionService.findAlreadyAppliedPetsIdsByOwner(ownerId) ;
 		if (!(it_Pet.hasNext())) {
 			modelMap.addAttribute("message", "No hay mascotas en adopcion");
 		}
 		modelMap.addAttribute("pet",pet);
+		modelMap.addAttribute("appliedpet",appliedpet);
 		return vista;
 		
 	}
@@ -171,12 +176,28 @@ public class PetController {
     }
     @GetMapping(value = "/pets/{petId}/adopt")
     public String adoptPet(@PathVariable("ownerId") int ownerId,
-    		@PathVariable("petId") int petId) {
-    	//Owner owner = this.ownerService.findOwnerById(ownerId);
+    		@PathVariable("petId") int petId) {  	
     	Pet pet = this.petService.findPetById(petId);
-    	//owner.removePet(pet);
     	this.petService.adoptionPet(pet);
     	return "redirect:/owners/{ownerId}";
+    }
+    @GetMapping(value = "/pets/{petId}/adoption")
+    public String adoptPetOwner(@PathVariable("ownerId") int ownerId,
+    		@PathVariable("petId") int petId) {
+    	Owner owner = this.ownerService.findOwnerById(ownerId);
+    	Pet pet = this.petService.findPetById(petId);
+    	Adoption adoption = new Adoption();
+    	adoption.setOwner(owner);
+    	adoption.setPet(pet);
+    	adoptionService.saveAdoption(adoption);
+    	return "redirect:/owners/{ownerId}/pets/listPets";
+    }
+    @GetMapping(value = "/pets/{petId}/Deleteadoption")
+    public String deleteadoptPetOwner(@PathVariable("ownerId") int ownerId,
+    		@PathVariable("petId") int petId) {
+    	Adoption adoption = adoptionService.findByOwnerAndPet(ownerId,petId);
+    	adoptionService.delete(adoption);
+    	return "redirect:/owners/{ownerId}/pets/listPets";
     }
 
 }

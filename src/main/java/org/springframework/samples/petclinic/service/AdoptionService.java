@@ -25,11 +25,12 @@ import org.springframework.util.StringUtils;
 public class AdoptionService {
 
 	private AdoptionRepository adoptionRepository;
-  
+		
 	@Autowired
 	public AdoptionService(AdoptionRepository adoptionRepository) {
 		this.adoptionRepository = adoptionRepository;
 	}
+
 
 	@Transactional(readOnly = true)
 	public Iterable<Adoption> findByPet(Pet pet) throws DataAccessException {
@@ -37,15 +38,23 @@ public class AdoptionService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Collection<Integer> findOwnerByPetId(int petId){
+	public Collection<Owner> findOwnerByPetId(int petId){
 		return this.adoptionRepository.findOwnerByPetId(petId);
 	}
 	
-//	@Transactional(readOnly = true)
-//	public List<Integer> findAlreadyAppliedPetsIdsByOwner(int ownerId){
-//		return this.adoptionRepository.findAlreadyAppliedPetsIdsByOwner(ownerId);
-//	}
 
+
+    @Transactional(readOnly = true)
+    public Iterable<Pet> findAlreadyAppliedPetsIdsByOwner(int ownerId){
+    	
+        return this.adoptionRepository.findAlreadyAppliedPetsIdsByOwner(ownerId);
+    }
+    @Transactional(readOnly = true)
+    public Adoption findByOwnerAndPet(int ownerId,int petId){
+    	
+        return this.adoptionRepository.findByOwnerAndPet(ownerId,petId);
+    }
+    
 	@Transactional
 	public void saveAdoption(Adoption adoption){
         this.adoptionRepository.save(adoption);                
